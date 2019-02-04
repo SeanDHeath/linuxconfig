@@ -2,7 +2,14 @@
   hosts: 127.0.0.1
   connection: local
   vars:
-    user: "{{ lookup('env', 'USER') }}"
+    packages:
+      - nextcloud-client
+      - qutebrowser
+      - atom
+      - vim
+      - keepassxc
+      - google-chrome-stable
+      - snapd
     zotero_version: "5.0.60"
   tasks:
 
@@ -59,31 +66,28 @@
         autoclean: yes
         autoremove: yes
       vars:
-        packages:
-        - nextcloud-client
-          - qutebrowser
-          - atom
-          - vim
-          - keepassxc
-          - google-chrome-stable
-          - snapd
 
     - name: Clone vim repository
       git:
         repo: https://github.com/seandheath/vim.git
         dest: ~/.vim
         version: master
+        update: yes
+      register: vim_results
+      changed_when: "vim_results.after|default('after') != vim_results.before|default('before')"
 
     - name: Remove old vim config
       file:
         path: ~/.vimrc
         state: absent
+      when: vim_results.changed
 
     - name: Run vim setup script
       command: "{{ item }}"
       with_items:
         - /bin/sh ~/.vim/setup.sh
         - vim +PlugInstall +qall
+      when: vim_results.changed
 
     - name: Extract Zotero
       become: yes
@@ -92,16 +96,36 @@
         dest: /opt/
         remote_src: yes
         creates: /opt/Zotero_linux-x86_64/
+      register: zotero_status
 
     - name: Run Zotero Icon Setup script
       become: yes
       command: /opt/Zotero_linux-x86_64/set_launcher_icon
+      when: zotero_status.changed
 
     - name: Install Zotero desktop file
       copy:
         src: /opt/Zotero_linux-x86_64/zotero.desktop
         dest: ~/.local/share/applications/zotero.desktop
+      when: zotero_status.changed
 
     - name: Install PyCharm Community Edition
       become: yes
       command: "snap install pycharm-community --classic"
+
+    - name: Install PEDA for gdb
+      become: yes
+      git:
+        repo: https://github.com/longld/peda.git
+        dest: /opt/peda
+        version: master
+        update: yes
+      register: peda_status
+
+    - name: Set PEDA up with .gdbinit
+      lineinfile:
+        state: present
+        path: ~/.gdbinit
+        line: "source /opt/peda.py"
+        create: yes
+      when: peda_status.changed
