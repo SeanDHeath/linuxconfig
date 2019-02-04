@@ -1,0 +1,107 @@
+- name: Sean Heath configuration of Debian
+  hosts: 127.0.0.1
+  connection: local
+  vars:
+    user: "{{ lookup('env', 'USER') }}"
+    zotero_version: "5.0.60"
+  tasks:
+
+    - name: Clean up home directory
+      file:
+        path: "{{ folders }}"
+        state: absent
+      vars:
+        folders:
+          - /root/Documents/
+          - /root/Music/
+          - /root/Pictures/
+          - /root/Public/
+          - /root/Templates/
+          - /root/Videos/
+
+    - name: Install dirmngr
+      become: yes
+      apt:
+        name: dirmngr
+        state: present
+
+    - name: Add Nextcloud apt key
+      become: yes
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: AD3DD469
+        state: present
+
+    - name: Add Google Chrome apt key
+      become: yes
+      apt_key:
+        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        state: present
+
+    - name: Add NextCloud repo
+      become: yes
+      copy:
+        src: files/nextcloud.list
+        dest: /etc/apt/sources.list.d/nextcloud.list
+
+    - name: Add Google Chrome repo
+      become: yes
+      copy:
+        content: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
+        dest: "/etc/apt/sources.list.d/google-chrome.list"
+
+    - name: Install packages
+      become: yes
+      apt:
+        name: "{{ packages }}"
+        update_cache: yes
+        state: present
+        autoclean: yes
+        autoremove: yes
+      vars:
+        packages:
+        - nextcloud-client
+          - qutebrowser
+          - atom
+          - vim
+          - keepassxc
+          - google-chrome-stable
+          - snapd
+
+    - name: Clone vim repository
+      git:
+        repo: https://github.com/seandheath/vim.git
+        dest: ~/.vim
+        version: master
+
+    - name: Remove old vim config
+      file:
+        path: ~/.vimrc
+        state: absent
+
+    - name: Run vim setup script
+      command: "{{ item }}"
+      with_items:
+        - /bin/sh ~/.vim/setup.sh
+        - vim +PlugInstall +qall
+
+    - name: Extract Zotero
+      become: yes
+      unarchive:
+        src: "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64&version={{ zotero_version }}"
+        dest: /opt/
+        remote_src: yes
+        creates: /opt/Zotero_linux-x86_64/
+
+    - name: Run Zotero Icon Setup script
+      become: yes
+      command: /opt/Zotero_linux-x86_64/set_launcher_icon
+
+    - name: Install Zotero desktop file
+      copy:
+        src: /opt/Zotero_linux-x86_64/zotero.desktop
+        dest: ~/.local/share/applications/zotero.desktop
+
+    - name: Install PyCharm Community Edition
+      become: yes
+      command: "snap install pycharm-community --classic"
