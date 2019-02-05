@@ -11,6 +11,7 @@
       - google-chrome-stable
       - snapd
       - aptitude
+      - network-manager-openvpn
     zotero_version: "5.0.60"
   tasks:
 
@@ -127,7 +128,7 @@
       lineinfile:
         state: present
         path: ~/.gdbinit
-        line: "source /opt/peda.py"
+        line: "source /opt/peda/peda.py"
         create: yes
       when: peda_status.changed
 
@@ -148,3 +149,9 @@
       apt:
         deb: /tmp/keybase.deb
       when: keybase_status.rc == 1
+
+    - name: Install nordnm
+      become: yes
+      pip:
+        name: nordnm
+        executable: pip3
