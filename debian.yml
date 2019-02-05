@@ -10,6 +10,7 @@
       - keepassxc
       - google-chrome-stable
       - snapd
+      - aptitude
     zotero_version: "5.0.60"
   tasks:
 
@@ -129,3 +130,21 @@
         line: "source /opt/peda.py"
         create: yes
       when: peda_status.changed
+
+    - name: Check if Keybase is installed
+      command: dpkg-query -W keybase
+      register: keybase_status
+      failed_when: keybase_status.rc > 1
+      changed_when: keybase_status.rc == 1
+
+    - name: Download Keybase
+      get_url:
+        url: https://prerelease.keybase.io/keybase_amd64.deb
+        dest: /tmp/keybase.deb
+      when: keybase_status.rc == 1
+
+    - name: Install Keybase
+      become: yes
+      apt:
+        deb: /tmp/keybase.deb
+      when: keybase_status.rc == 1
