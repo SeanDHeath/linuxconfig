@@ -12,6 +12,7 @@
       - snapd
       - aptitude
       - network-manager-openvpn
+      - evince
     zotero_version: "5.0.60"
   tasks:
 
@@ -103,13 +104,12 @@
     - name: Run Zotero Icon Setup script
       become: yes
       command: /opt/Zotero_linux-x86_64/set_launcher_icon
-      when: zotero_status.changed
 
     - name: Install Zotero desktop file
-      copy:
+      file:
         src: /opt/Zotero_linux-x86_64/zotero.desktop
         dest: ~/.local/share/applications/zotero.desktop
-      when: zotero_status.changed
+        state: link
 
     - name: Install PyCharm Community Edition
       become: yes
