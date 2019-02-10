@@ -13,6 +13,9 @@
       - aptitude
       - network-manager-openvpn
       - evince
+      - virtualenv
+      - tree
+      - golang
     zotero_version: "5.0.60"
   tasks:
 
