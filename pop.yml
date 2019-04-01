@@ -16,6 +16,7 @@
       - golang
       - python3-pip
       - gnome-tweak-tool
+      - libaio1
         
   tasks:
     - name: Clean up home directory
@@ -140,17 +141,19 @@
         dest: ~/.local/share/gnome-shell/extensions/gTile@vibou
         update: yes
 
-    - name: Download VMWare Workstation 15
-      get_url:
-        url: https://www.vmware.com/go/getworkstation-linux
-        dest: /tmp/vmware.bundle
-
     - name: Check if VMWare is installed
       command: which vmware
       register: vmware_status
       ignore_errors: True
 
+    - name: Download VMWare Workstation 15
+      get_url:
+        url: https://www.vmware.com/go/getworkstation-linux
+        dest: /tmp/vmware.bundle
+        force: yes
+      when: vmware_status.rc == 1
+
     - name: Install VMWare Workstation 15
       become: yes
-      command: bash /tmp/vmware.bundle --eulas-agreed -I --required --console
+      command: bash /tmp/vmware.bundle --eulas-agreed -I --required
       when: vmware_status.rc == 1
