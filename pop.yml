@@ -148,8 +148,7 @@
     - name: Check if VMWare is installed
       command: which vmware
       register: vmware_status
-      changed_when: vmware_status.rc == 0
-      failed_when: vmware_status.rc == 1
+      ignore_errors: True
 
     - name: Install VMWare Workstation 15
       become: yes
