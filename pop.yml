@@ -142,8 +142,8 @@
 
     - name: Download VMWare Workstation 15
       get_url:
-        url: https://prerelease.keybase.io/keybase_amd64.deb
-        dest: /tmp/keybase.deb
+        url: https://www.vmware.com/go/getworkstation-linux
+        dest: /tmp/vmware.bundle
 
     - name: Check if VMWare is installed
       command: which vmware
