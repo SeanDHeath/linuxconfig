@@ -1,2 +1,2 @@
-# debian-ansible
-Ansible scripts to set up Debian the way I like it
+# Sean Heath Linux Config
+Check out the branch for the distribution you're using
