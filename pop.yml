@@ -17,14 +17,14 @@
       - python3-pip
       - gnome-tweak-tool
       - libaio1
+      - htop
         
   tasks:
     - name: Clean up home directory
       file:
-        path: "{{ folders }}"
+        path: "{{ item }}"
         state: absent
-      vars:
-        folders:
+      with_items:
           - ~/Documents/
           - ~/Music/
           - ~/Pictures/
@@ -157,3 +157,12 @@
       become: yes
       command: bash /tmp/vmware.bundle --eulas-agreed -I --required
       when: vmware_status.rc == 1
+
+    - name: Remove VMWare Workstation Player desktop files
+      become: yes
+      file: 
+        path: "{{ item }}"
+        state: absent
+      with_items:
+          - /usr/local/share/applications/vmware-player.desktop
+          - /usr/share/applications/vmware-player.desktop
