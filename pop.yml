@@ -4,7 +4,6 @@
   vars:
     packages:
       - nextcloud-client
-      - qutebrowser
       - atom
       - vim
       - keepassxc
@@ -16,6 +15,8 @@
       - tree
       - golang
       - python3-pip
+      - gnome-tweak-tool
+        
   tasks:
     - name: Clean up home directory
       file:
@@ -23,12 +24,12 @@
         state: absent
       vars:
         folders:
-          - /root/Documents/
-          - /root/Music/
-          - /root/Pictures/
-          - /root/Public/
-          - /root/Templates/
-          - /root/Videos/
+          - ~/Documents/
+          - ~/Music/
+          - ~/Pictures/
+          - ~/Public/
+          - ~/Templates/
+          - ~/Videos/
 
     - name: Install dirmngr
       become: yes
@@ -132,3 +133,23 @@
       pip:
         name: nordnm
         executable: pip3
+
+    - name: Install gTile extension
+      git:
+        repo: https://github.com/gTile/gTile
+        dest: ~/.local/share/gnome-shell/extensions/gTile@vibou
+        update: yes
+
+    - name: Download VMWare Workstation 15
+      get_url:
+        url: https://prerelease.keybase.io/keybase_amd64.deb
+        dest: /tmp/keybase.deb
+
+    - name: Check if VMWare is installed
+      command: which vmware
+      register: vmware_status
+
+    - name: Install VMWare Workstation 15
+      become: yes
+      command: bash /tmp/vmware.bundle --eulas-agreed -I --required --console
+      when: vmware_status.rc == 1
