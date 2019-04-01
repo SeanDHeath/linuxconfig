@@ -9,16 +9,14 @@
       - vim
       - keepassxc
       - google-chrome-stable
-      - snapd
       - aptitude
       - network-manager-openvpn
       - evince
       - virtualenv
       - tree
       - golang
-    zotero_version: "5.0.60"
+      - python3-pip
   tasks:
-
     - name: Clean up home directory
       file:
         path: "{{ folders }}"
@@ -92,31 +90,7 @@
       command: "{{ item }}"
       with_items:
         - /bin/sh ~/.vim/setup.sh
-        - vim +PlugInstall +qall
       when: vim_results.changed
-
-    - name: Extract Zotero
-      become: yes
-      unarchive:
-        src: "https://www.zotero.org/download/client/dl?channel=release&platform=linux-x86_64&version={{ zotero_version }}"
-        dest: /opt/
-        remote_src: yes
-        creates: /opt/Zotero_linux-x86_64/
-      register: zotero_status
-
-    - name: Run Zotero Icon Setup script
-      become: yes
-      command: /opt/Zotero_linux-x86_64/set_launcher_icon
-
-    - name: Install Zotero desktop file
-      file:
-        src: /opt/Zotero_linux-x86_64/zotero.desktop
-        dest: ~/.local/share/applications/zotero.desktop
-        state: link
-
-    - name: Install PyCharm Community Edition
-      become: yes
-      command: "snap install pycharm-community --classic"
 
     - name: Install PEDA for gdb
       become: yes

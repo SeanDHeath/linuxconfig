@@ -1,2 +1,2 @@
-# debian-ansible
-Ansible scripts to set up Debian the way I like it
+# linux configuration
+Ansible scripts to set up Linux the way I like it
