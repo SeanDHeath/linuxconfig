@@ -32,6 +32,12 @@
           - ~/Templates/
           - ~/Videos/
 
+    - name: Create extensions directory
+      file:
+        path: ~/.local/share/gnome-shell/extensions/
+        state: directory
+      ignore_errors: True
+
     - name: Install dirmngr
       become: yes
       apt:
@@ -138,7 +144,7 @@
     - name: Install gTile extension
       git:
         repo: https://github.com/gTile/gTile
-        dest: ~/.local/share/gnome-shell/extensions/gTile@vibou
+        dest: ~/.local/share/gnome-shell/extensions/gTile
         update: yes
 
     - name: Check if VMWare is installed
@@ -166,3 +172,18 @@
       with_items:
           - /usr/local/share/applications/vmware-player.desktop
           - /usr/share/applications/vmware-player.desktop
+
+    - name: Download Dash to Dock
+      git:
+        repo: https://github.com/micheleg/dash-to-dock.git
+        dest: ~/.local/share/gnome-shell/extensions/dash-to-dock
+        version: gnome-3.30
+
+    - name: Make Dash-to-Dock
+      make:
+        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock
+
+    - name: Install Dash-to-Dock
+      make:
+        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock
+        target: install
