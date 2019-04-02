@@ -141,11 +141,6 @@
         name: nordnm
         executable: pip3
 
-    - name: Install gTile extension
-      git:
-        repo: https://github.com/gTile/gTile
-        dest: ~/.local/share/gnome-shell/extensions/gTile
-        update: yes
 
     - name: Check if VMWare is installed
       command: which vmware
@@ -173,17 +168,30 @@
           - /usr/local/share/applications/vmware-player.desktop
           - /usr/share/applications/vmware-player.desktop
 
+    - name: Install gTile extension
+      git:
+        repo: https://github.com/gTile/gTile
+        dest: ~/.local/share/gnome-shell/extensions/gTile@vibou
+        update: yes
+
     - name: Download Dash to Dock
       git:
         repo: https://github.com/micheleg/dash-to-dock.git
-        dest: ~/.local/share/gnome-shell/extensions/dash-to-dock
+        dest: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
         version: gnome-3.30
 
     - name: Make Dash-to-Dock
       make:
-        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock
+        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
 
     - name: Install Dash-to-Dock
       make:
-        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock
+        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
         target: install
+
+    - name: Download AppIndicator
+      unarchive:
+        src: https://github.com/ubuntu/gnome-shell-extension-appindicator/archive/ubuntu-18.04.1.zip
+        dest: ~/.local/share/gnome-shell/extensions/
+        remote_src: yes
+
