@@ -203,11 +203,9 @@
         dest: ~/.local/share/gnome-shell/extensions/
         remote_src: yes
 
-    - name: Blacklist i2c_hid for touchpad
+    - name: Fix touchpad on suspend
       become: yes
-      blockinfile:
-        path: /etc/modprobe.d/touchpad.conf
-        block: |
-          blacklist i2c_hid
-          install i2c_hid /bin/false
-
+      copy:
+        src: files/touchpad
+        dest: /lib/systemd/system-sleep/touchpad
+        mode: 0755
