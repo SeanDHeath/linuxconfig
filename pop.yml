@@ -15,6 +15,11 @@
       - tree
       - golang
       - python3-pip
+      - python3-dev
+      - python3-pexpect
+      - python-pexpect
+      - build-essential
+      - cmake
       - gnome-tweak-tool
       - libaio1
       - htop
@@ -209,3 +214,26 @@
         src: files/touchpad
         dest: /lib/systemd/system-sleep/touchpad
         mode: 0755
+
+    - name: Check if rust is installed
+      command: which rustc
+      register: rust_status
+      ignore_errors: True
+
+    - name: Install rustup
+      become: yes
+      get_url:
+        url: https://sh.rustup.rs
+        dest: /usr/local/rustup
+        mode: 0755
+      when: rust_status.rc == 1
+
+    - name: Install rust
+      expect:
+        command: rustup
+        responses:
+          '^>': '1'
+      when: rust_status.rc == 1
+
+    - name: Install YouCompleteMe
+      command: python3 ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer
