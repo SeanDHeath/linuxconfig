@@ -3,8 +3,8 @@
   connection: local
   vars:
     packages:
-      - nextcloud-client
       - atom
+      - syncthing
       - vim
       - keepassxc
       - google-chrome-stable
@@ -44,30 +44,11 @@
         state: directory
       ignore_errors: True
 
-    - name: Install dirmngr
-      become: yes
-      apt:
-        name: dirmngr
-        state: present
-
-    - name: Add Nextcloud apt key
-      become: yes
-      apt_key:
-        keyserver: keyserver.ubuntu.com
-        id: AD3DD469
-        state: present
-
     - name: Add Google Chrome apt key
       become: yes
       apt_key:
         url: https://dl-ssl.google.com/linux/linux_signing_key.pub
         state: present
-
-    - name: Add NextCloud repo
-      become: yes
-      copy:
-        src: files/nextcloud.list
-        dest: /etc/apt/sources.list.d/nextcloud.list
 
     - name: Add Google Chrome repo
       become: yes
@@ -202,12 +183,6 @@
       make:
         chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
         target: install
-
-    - name: Download AppIndicator
-      unarchive:
-        src: https://github.com/ubuntu/gnome-shell-extension-appindicator/archive/ubuntu-18.04.1.zip
-        dest: ~/.local/share/gnome-shell/extensions/
-        remote_src: yes
 
     - name: Fix touchpad on suspend
       become: yes
