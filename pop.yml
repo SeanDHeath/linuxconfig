@@ -24,6 +24,7 @@
       - libaio1
       - htop
       - secure-delete
+      - gnome-shell-extension-appindicator
         
   tasks:
     - name: Clean up home directory
