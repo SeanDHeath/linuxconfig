@@ -208,3 +208,42 @@
         state: present
         path: "~/.config/autostart/gnome-keyring-ssh.desktop"
         line: "Hidden=true"
+
+    - name: Disable gnome-keyring ssh-agent
+      lineinfile:
+        state: present
+        path: "~/.config/autostart/gnome-keyring-ssh.desktop"
+        line: "X-GNOME-Autostart-enabled=false"
+
+    - name: Ensure user systemd folder exists
+      file:
+        path: '~/.config/systemd/user/'
+        state: directory
+        recurse: yes
+
+    - name: Add ssh-agent to systemd
+      copy:
+        src: 'files/ssh-agent.service'
+        dest: '~/.config/systemd/user/ssh-agent.service'
+        mode: 0755
+
+    - name: Enable ssh-agent service
+      systemd:
+        enabled: yes
+        state: started
+        user: yes
+        name: ssh-agent
+
+    - name: Fix XDG_RUNTIME_DIR
+      lineinfile:
+        state: present
+        path: "~/.pam_environment"
+        line: 'SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/ssh-agent.socket"'
+
+    - name: Fix Gnome keyring overwriting SSH_AUTH_SOCK
+      lineinfile:
+        state: present
+        path: "~/.pam_environment"
+        line: 'GSM_SKIP_SSH_AGENT_WORKAROUND=1'
+
+
