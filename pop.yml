@@ -24,6 +24,7 @@
       - libaio1
       - htop
       - secure-delete
+      - syncthing-gtk
       - gnome-shell-extension-appindicator
         
   tasks:
