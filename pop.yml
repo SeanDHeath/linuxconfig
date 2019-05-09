@@ -1,4 +1,4 @@
-- name: Sean Heath configuration of Debian
+- name: 'Sean Heath configuration of Pop_OS'
   hosts: 127.0.0.1
   connection: local
   vars:
@@ -26,6 +26,7 @@
       - secure-delete
       - syncthing-gtk
       - gnome-shell-extension-appindicator
+      - virt-manager
         
   tasks:
     - name: Clean up home directory
@@ -42,14 +43,14 @@
 
     - name: Create extensions directory
       file:
-        path: ~/.local/share/gnome-shell/extensions/
+        path: "~/.local/share/gnome-shell/extensions/"
         state: directory
       ignore_errors: True
 
     - name: Add Google Chrome apt key
       become: yes
       apt_key:
-        url: https://dl-ssl.google.com/linux/linux_signing_key.pub
+        url: 'https://dl-ssl.google.com/linux/linux_signing_key.pub'
         state: present
 
     - name: Add Google Chrome repo
@@ -68,10 +69,17 @@
         autoremove: yes
       vars:
 
+    - name: Add user to libvirt group
+      become: yes
+      user:
+        name: "{{ ansible_user_id }}"
+        append: yes
+        group: libvirt
+
     - name: Clone vim repository
       git:
-        repo: https://github.com/seandheath/vim.git
-        dest: ~/.vim
+        repo: 'https://github.com/seandheath/vim.git'
+        dest: '~/.vim'
         version: master
         update: yes
       register: vim_results
@@ -85,8 +93,8 @@
       
     - name: Clone bash repository
       git:
-        repo: https://seandheath@github.com/seandheath/bash.git
-        dest: ~/.bash
+        repo: 'https://seandheath@github.com/seandheath/bash.git'
+        dest: '~/.bash'
         version: master
         update: yes
       register: bash_results
@@ -95,14 +103,14 @@
     - name: Run bash setup script
       command: "{{ item }}"
       with_items:
-        - /bin/bash ~/.bash/setup.sh
+        - '/bin/bash ~/.bash/setup.sh'
       when: bash_results.changed
 
     - name: Install PEDA for gdb
       become: yes
       git:
-        repo: https://github.com/longld/peda.git
-        dest: /opt/peda
+        repo: 'https://github.com/longld/peda.git'
+        dest: '/opt/peda'
         version: master
         update: yes
       register: peda_status
@@ -110,27 +118,27 @@
     - name: Set PEDA up with .gdbinit
       lineinfile:
         state: present
-        path: ~/.gdbinit
+        path: '~/.gdbinit'
         line: "source /opt/peda/peda.py"
         create: yes
       when: peda_status.changed
 
     - name: Check if Keybase is installed
-      command: dpkg-query -W keybase
+      command: 'dpkg-query -W keybase'
       register: keybase_status
       failed_when: keybase_status.rc > 1
       changed_when: keybase_status.rc == 1
 
     - name: Download Keybase
       get_url:
-        url: https://prerelease.keybase.io/keybase_amd64.deb
-        dest: /tmp/keybase.deb
+        url: 'https://prerelease.keybase.io/keybase_amd64.deb'
+        dest: '/tmp/keybase.deb'
       when: keybase_status.rc == 1
 
     - name: Install Keybase
       become: yes
       apt:
-        deb: /tmp/keybase.deb
+        deb: '/tmp/keybase.deb'
       when: keybase_status.rc == 1
 
     - name: Install nordnm
@@ -139,79 +147,64 @@
         name: nordnm
         executable: pip3
 
-    - name: Check if VMWare is installed
-      command: which vmware
-      register: vmware_status
-      ignore_errors: True
-
-    - name: Download VMWare Workstation 15
-      get_url:
-        url: https://www.vmware.com/go/getworkstation-linux
-        dest: /tmp/vmware.bundle
-        force: yes
-      when: vmware_status.rc == 1
-
-    - name: Install VMWare Workstation 15
-      become: yes
-      command: bash /tmp/vmware.bundle --eulas-agreed -I --required
-      when: vmware_status.rc == 1
-
-    - name: Remove VMWare Workstation Player desktop files
-      become: yes
-      file: 
-        path: "{{ item }}"
-        state: absent
-      with_items:
-          - /usr/local/share/applications/vmware-player.desktop
-          - /usr/share/applications/vmware-player.desktop
-
     - name: Install gTile extension
       git:
-        repo: https://github.com/gTile/gTile
-        dest: ~/.local/share/gnome-shell/extensions/gTile@vibou
+        repo: 'https://github.com/gTile/gTile'
+        dest: '~/.local/share/gnome-shell/extensions/gTile@vibou'
         update: yes
 
     - name: Download Dash to Dock
       git:
-        repo: https://github.com/micheleg/dash-to-dock.git
-        dest: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
+        repo: 'https://github.com/micheleg/dash-to-dock.git'
+        dest: '~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg'
         version: gnome-3.30
 
     - name: Make Dash-to-Dock
       make:
-        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
+        chdir: '~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg'
 
     - name: Install Dash-to-Dock
       make:
-        chdir: ~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg
+        chdir: '~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg'
         target: install
 
     - name: Fix touchpad on suspend
       become: yes
       copy:
-        src: files/touchpad
-        dest: /lib/systemd/system-sleep/touchpad
+        src: 'files/touchpad'
+        dest: '/lib/systemd/system-sleep/touchpad'
         mode: 0755
 
     - name: Check if rust is installed
-      command: which rustc
+      command: 'which rustc'
       register: rust_status
       ignore_errors: True
 
     - name: Install rustup
       become: yes
       get_url:
-        url: https://sh.rustup.rs
-        dest: /usr/local/rustup
+        url: 'https://sh.rustup.rs'
+        dest: '/usr/local/rustup'
         mode: 0755
       when: rust_status.rc == 1
 
     - name: Install rust
       expect:
-        command: rustup
+        command: 'rustup'
         responses:
           '>': '1'
       when: rust_status.rc == 1
 
     - name: Install YouCompleteMe
-      command: source ~/.cargo/env  python3 ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer
+      shell: '. ~/.cargo/env && python3 ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer'
+
+    - name: Move gnome-keyring file to disable ssh-agent
+      copy:
+        src: "/etc/xdg/autostart/gnome-keyring-ssh.desktop"
+        dest: "~/.config/autostart/gnome-keyring-ssh.desktop"
+
+    - name: Disable gnome-keyring ssh-agent
+      lineinfile:
+        state: present
+        path: "~/.config/autostart/gnome-keyring-ssh.desktop"
+        line: "Hidden=true"
