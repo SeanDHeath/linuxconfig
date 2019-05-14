@@ -26,6 +26,7 @@
       - secure-delete
       - syncthing-gtk
       - gnome-shell-extension-appindicator
+      - plank
       - virt-manager
         
   tasks:
@@ -80,31 +81,27 @@
       git:
         repo: 'https://github.com/seandheath/vim.git'
         dest: '~/.vim'
+        force: yes
         version: master
         update: yes
-      register: vim_results
-      changed_when: "vim_results.after|default('after') != vim_results.before|default('before')"
 
     - name: Run vim setup script
       command: "{{ item }}"
       with_items:
         - /bin/bash ~/.vim/setup.sh
-      when: vim_results.changed
       
     - name: Clone bash repository
       git:
         repo: 'https://seandheath@github.com/seandheath/bash.git'
         dest: '~/.bash'
         version: master
+        force: yes
         update: yes
-      register: bash_results
-      changed_when: "bash_results.after|default('after') != bash_results.before|default('before')"
 
     - name: Run bash setup script
       command: "{{ item }}"
       with_items:
         - '/bin/bash ~/.bash/setup.sh'
-      when: bash_results.changed
 
     - name: Install PEDA for gdb
       become: yes
@@ -194,6 +191,12 @@
         responses:
           '>': '1'
       when: rust_status.rc == 1
+
+    - name: Update YouCompleteMe
+      shell: 'git submodule update --init --recursive'
+      args:
+        chdir: '~/.vim/plugged/YouCompleteMe'
+        
 
     - name: Install YouCompleteMe
       shell: '. ~/.cargo/env && python3 ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer'
