@@ -4,7 +4,6 @@
   vars:
     packages:
       - atom
-      - syncthing
       - vim
       - keepassxc
       - google-chrome-stable
@@ -24,10 +23,10 @@
       - libaio1
       - htop
       - secure-delete
-      - syncthing-gtk
       - gnome-shell-extension-appindicator
       - plank
       - virt-manager
+      - nextcloud-client
         
   tasks:
     - name: Clean up home directory
@@ -42,11 +41,18 @@
           - ~/Templates/
           - ~/Videos/
 
-    - name: Create extensions directory
-      file:
-        path: "~/.local/share/gnome-shell/extensions/"
-        state: directory
-      ignore_errors: True
+    - name: Install dirmngr
+      become: yes
+      apt:
+        name: dirmngr
+        state: present
+
+    - name: Add Nextcloud apt key
+      become: yes
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: AD3DD469
+        state: present
 
     - name: Add Google Chrome apt key
       become: yes
@@ -59,6 +65,12 @@
       copy:
         content: "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main"
         dest: "/etc/apt/sources.list.d/google-chrome.list"
+
+    - name: Add NextCloud repo
+      become: yes
+      copy:
+        src: files/nextcloud.list
+        dest: /etc/apt/sources.list.d/nextcloud.list
 
     - name: Install packages
       become: yes
@@ -149,21 +161,6 @@
         repo: 'https://github.com/gTile/gTile'
         dest: '~/.local/share/gnome-shell/extensions/gTile@vibou'
         update: yes
-
-    - name: Download Dash to Dock
-      git:
-        repo: 'https://github.com/micheleg/dash-to-dock.git'
-        dest: '~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg'
-        version: gnome-3.30
-
-    - name: Make Dash-to-Dock
-      make:
-        chdir: '~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg'
-
-    - name: Install Dash-to-Dock
-      make:
-        chdir: '~/.local/share/gnome-shell/extensions/dash-to-dock@micheleg'
-        target: install
 
     - name: Fix touchpad on suspend
       become: yes
