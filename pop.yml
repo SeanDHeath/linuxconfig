@@ -4,6 +4,8 @@
   vars:
     packages:
       - atom
+      - progress
+      - exfat-utils
       - vim
       - keepassxc
       - google-chrome-stable
