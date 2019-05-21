@@ -26,6 +26,7 @@
       - gnome-shell-extension-appindicator
       - plank
       - virt-manager
+      - libnextcloudsync0=2.3.3-20171224.060956~zesty1
       - nextcloud-client
         
   tasks:
@@ -81,6 +82,12 @@
         autoclean: yes
         autoremove: yes
       vars:
+
+    - name: hold libnextcloudsync0
+      become: yes
+      dpkg_selections:
+              name: libnextcloudsync0
+              selection: hold
 
     - name: Add user to libvirt group
       become: yes
@@ -178,7 +185,7 @@
       become: yes
       get_url:
         url: 'https://sh.rustup.rs'
-        dest: '/usr/local/rustup'
+        dest: '/usr/local/bin/rustup'
         mode: 0755
       when: rust_status.rc == 1
 
@@ -197,6 +204,11 @@
 
     - name: Install YouCompleteMe
       shell: '. ~/.cargo/env && python3 ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer'
+
+    - name: Create folders for ssh-agent config
+      file:
+        path: '~/.config/autostart'
+        state: directory
 
     - name: Move gnome-keyring file to disable ssh-agent
       copy:
@@ -238,7 +250,7 @@
       lineinfile:
         state: present
         path: "~/.pam_environment"
-        line: 'SSH_AUTH_SOCK DEFAULT="${XDG_RUNTIME_DIR}/ssh-agent.socket"'
+        line: 'SSH_AUTH_SOCK DEFAULT="/run/user/{{ansible_user_id}}/ssh-agent.socket"'
 
     - name: Fix Gnome keyring overwriting SSH_AUTH_SOCK
       lineinfile:
