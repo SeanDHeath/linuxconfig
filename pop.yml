@@ -30,6 +30,7 @@
       - virt-manager
       - libnextcloudsync0=2.3.3-20171224.060956~zesty1
       - nextcloud-client
+      - qownnotes
         
   tasks:
     - name: Clean up home directory
@@ -74,6 +75,12 @@
       copy:
         src: files/nextcloud.list
         dest: /etc/apt/sources.list.d/nextcloud.list
+
+    - name: Add QOwnNotes repo
+      become: yes
+      apt_repository:
+        repo: ppa:pbek/qownnotes
+        state: present
 
     - name: Install packages
       become: yes
@@ -259,5 +266,4 @@
         state: present
         path: "~/.pam_environment"
         line: 'GSM_SKIP_SSH_AGENT_WORKAROUND=1'
-
 
