@@ -31,6 +31,8 @@
       - libnextcloudsync0=2.3.3-20171224.060956~zesty1
       - nextcloud-client
       - qownnotes
+      - dconf-editor
+      - python-psutil
     nordvpn_version: "1.0.0"
         
   tasks:
@@ -293,4 +295,39 @@
         path: "~/.pam_environment"
         line: 'GSM_SKIP_SSH_AGENT_WORKAROUND=1'
 
+    - name: Fix alt-tab
+      dconf:
+        key: "/org/gnome/desktop/wm/keybindings/switch-windows"
+        value: "['<Alt>Tab']"
+        state: present
+
+    - name: Fix super-tab
+      dconf:
+        key: "/org/gnome/desktop/wm/keybindings/switch-applications"
+        value: "['<Super>Tab']"
+        state: present
+
+    - name: Fix home keybinding
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/home"
+        value: "'<Super>e'"
+        state: present
+
+    - name: Fix terminal keybinding binding
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/binding"
+        value: "'<Primary><Alt>t'"
+        state: present
+
+    - name: Fix terminal keybinding command
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/command"
+        value: "'gnome-terminal'"
+        state: present
+
+    - name: Fix terminal keybinding name
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name"
+        value: "'terminal'"
+        state: present
 
