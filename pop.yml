@@ -31,6 +31,7 @@
       - libnextcloudsync0=2.3.3-20171224.060956~zesty1
       - nextcloud-client
       - qownnotes
+    nordvpn_version: "1.0.0"
         
   tasks:
     - name: Clean up home directory
@@ -44,6 +45,11 @@
           - ~/Public/
           - ~/Templates/
           - ~/Videos/
+
+    - name: create flag directory
+      file:
+        path: 'flag'
+        state: directory
 
     - name: Install dirmngr
       become: yes
@@ -81,6 +87,10 @@
       apt_repository:
         repo: ppa:pbek/qownnotes
         state: present
+
+    - name: Add nordvpn repo
+      apt:
+        deb: 'https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/nordvpn-release_{{nordvpn_version}}_all.deb'
 
     - name: Install packages
       become: yes
@@ -205,14 +215,26 @@
           '>': '1'
       when: rust_status.rc == 1
 
+    - name: Check if YouCompleteMe has been installed
+      stat:
+        path: 'flag/vim-ycm-complete'
+      register: ycm_status
+
     - name: Update YouCompleteMe
       shell: 'git submodule update --init --recursive'
       args:
         chdir: '~/.vim/plugged/YouCompleteMe'
-        
+      when: ycm_status.stat.exists == false
 
     - name: Install YouCompleteMe
       shell: '. ~/.cargo/env && python3 ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer'
+      when: ycm_status.stat.exists == false
+
+    - name: Set vim-ycm-complete 
+      file:
+        path: 'flag/vim-ycm-complete'
+        state: touch
+      when: ycm_status.stat.exists == false
 
     - name: Create folders for ssh-agent config
       file:
@@ -255,15 +277,20 @@
         user: yes
         name: ssh-agent
 
+    - name: get UID
+      shell: 'id -u'
+      register: uid
+
     - name: Fix XDG_RUNTIME_DIR
       lineinfile:
         state: present
         path: "~/.pam_environment"
-        line: 'SSH_AUTH_SOCK DEFAULT="/run/user/{{ansible_user_id}}/ssh-agent.socket"'
+        line: 'SSH_AUTH_SOCK DEFAULT="/run/user/{{uid}}/ssh-agent.socket"'
 
     - name: Fix Gnome keyring overwriting SSH_AUTH_SOCK
       lineinfile:
         state: present
         path: "~/.pam_environment"
         line: 'GSM_SKIP_SSH_AGENT_WORKAROUND=1'
+
 
