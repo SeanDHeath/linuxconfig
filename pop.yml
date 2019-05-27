@@ -44,7 +44,6 @@
           - ~/Documents/
           - ~/Music/
           - ~/Pictures/
-          - ~/Public/
           - ~/Templates/
           - ~/Videos/
 
@@ -329,5 +328,23 @@
       dconf:
         key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom0/name"
         value: "'terminal'"
+        state: present
+
+    - name: Fix screenshot keybinding binding
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/binding"
+        value: "'<Primary><Super>s'"
+        state: present
+
+    - name: Fix screenshot keybinding command
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/command"
+        value: "'gnome-screenshot -ac'"
+        state: present
+
+    - name: Fix screenshot keybinding name
+      dconf:
+        key: "/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/custom1/name"
+        value: "'screenshot'"
         state: present
 
