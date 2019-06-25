@@ -1,13 +1,14 @@
 #!/bin/bash
 say="figlet -f small -c"
 dir=$(pwd)
-yay -S --noconfirm figlet
+sudo sed -i -e "s/#MAKEFLAGS=.*/MAKEFLAGS=\"-j$(nproc --all)\"/g"
+yay -S --needed --noconfirm figlet
 $say "Installing packages"
 
 yay -S --needed --noconfirm $(cat $dir/packages)
 
 $say "Fixing libvirt group"
-sudo usermod -aG libvirt libvirt $USER
+sudo usermod -aG libvirt $USER
 
 $say "Installing nordnm"
 sudo -H pip install nordnm
