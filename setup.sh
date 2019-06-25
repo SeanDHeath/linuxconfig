@@ -1,15 +1,18 @@
 #!/bin/bash
+say="figlet -f small -c"
 dir=$(pwd)
-echo "Installing packages"
-yay -S --needed $(cat $dir/packages)
+yay -S --noconfirm figlet
+$say "Installing packages"
 
-echo "Fixing libvirt group"
+yay -S --needed --noconfirm $(cat $dir/packages)
+
+$say "Fixing libvirt group"
 sudo usermod -aG libvirt libvirt $USER
 
-echo "Installing nordnm"
+$say "Installing nordnm"
 sudo -H pip install nordnm
 
-echo "Installing Rust"
+$say "Installing Rust"
 if [ -e "/usr/local/bin/rustup" ]  ; then
   echo "Rust already installed"
 else
@@ -18,8 +21,8 @@ else
   rustup -y
 fi
 
-echo "Setting up vim"
-if [ -e "~/.vim" ] ; then
+$say "Setting up vim"
+if [ -d "$HOME/.vim/" ]; then
   echo "vim already installed"
 else
   git clone https://github.com/seandheath/vim.git ~/.vim
@@ -31,8 +34,8 @@ else
   cd $dir
 fi
 
-echo "Setting up bash"
-if [ -e "~/.bash" ] ; then
+$say "Setting up bash"
+if [ -d "$HOME/.bash/" ]; then
   echo "bash already set up"
 else
   git clone https://github.com/seandheath/bash.git ~/.bash
@@ -41,21 +44,21 @@ else
   cd $dir
 fi
 
-echo "Setting up PEDA"
-if [ -e "/opt/peda" ] ; then
+$say "Setting up PEDA"
+if [ -d "/opt/peda/" ]; then
   echo "PEDA already set up"
 else
   sudo git clone https://github.com/longld/peda.git /opt/peda
   echo "source /opt/peda/peda.py" >> ~/.gdbinit
 fi
 
-echo "Fixing touchpad"
-if [ -e "/lib/systemd/system-sleep/touchpad" ] ; then
+$say "Fixing touchpad"
+if [ -e "/lib/systemd/system-sleep/touchpad" ]; then
   echo "touchpad already fixed"
 else
   sudo cp $dir/files/touchpad /lib/systemd/system-sleep/touchpad
   sudo chmod 0755 /lib/systemd/system-sleep/touchpad
 fi
 
-echo "Cleaning up directories"
-rmdir Music Pictures Public Templates Videos
+$say "Cleaning up directories"
+rmdir ~/Music ~/Pictures ~/Public ~/Templates ~/Videos
