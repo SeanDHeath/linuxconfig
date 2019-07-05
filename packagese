@@ -6,15 +6,12 @@ tree
 htop
 virt-manager
 nextcloud-client
-keybase-bin
+keybase
 python-pip
 clang
 typescript
 go
 cmake
 vscodium-bin
-qemu
-ebtables
-dnsmasq
-xsane
 jre-openjdk
+test
