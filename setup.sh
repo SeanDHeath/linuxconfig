@@ -1,14 +1,17 @@
 #!/bin/bash
 say="figlet -f small -c"
-dir=$(pwd)
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+me=$USER
 sudo sed -i -e "s/#MAKEFLAGS=.*/MAKEFLAGS=\"-j$(nproc --all)\"/g"
 yay -S --needed --noconfirm figlet
 $say "Installing packages"
 
-yay -S --needed --noconfirm $(cat $dir/packages)
+yay -S --needed --noconfirm $(cat $DIR/packages)
 
 $say "Fixing libvirt group"
-sudo usermod -aG libvirt $USER
+sudo usermod -aG libvirt $me
+sudo systemctl enable libvirtd
+sudo systemctl start libvirtd
 
 $say "Installing nordnm"
 sudo -H pip install nordnm
@@ -32,7 +35,7 @@ else
   cd ~/.vim/plugged/YouCompleteMe
   git submodule update --init --recursive
   . ~/.cargo/env && python ~/.vim/plugged/YouCompleteMe/install.py --clang-completer --rust-completer --go-completer
-  cd $dir
+  cd $DIR
 fi
 
 $say "Setting up bash"
@@ -42,7 +45,7 @@ else
   git clone https://github.com/seandheath/bash.git ~/.bash
   cd ~/.bash
   /bin/bash setup.sh
-  cd $dir
+  cd $DIR
 fi
 
 $say "Setting up PEDA"
@@ -57,9 +60,14 @@ $say "Fixing touchpad"
 if [ -e "/lib/systemd/system-sleep/touchpad" ]; then
   echo "touchpad already fixed"
 else
-  sudo cp $dir/files/touchpad /lib/systemd/system-sleep/touchpad
+  sudo cp $DIR/files/touchpad /lib/systemd/system-sleep/touchpad
   sudo chmod 0755 /lib/systemd/system-sleep/touchpad
 fi
 
 $say "Cleaning up directories"
-rmdir ~/Music ~/Pictures ~/Public ~/Templates ~/Videos
+targets=(Music Pictures Public Templates Videos)
+for target in $targets; do 
+  if [ -d "~/$target" ]; then
+    rm ~/$target
+  fi
+done
