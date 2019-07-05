@@ -61,5 +61,13 @@ else
   sudo chmod 0755 /lib/systemd/system-sleep/touchpad
 fi
 
+$say "Disabling system beep"
+if [ -e "~/.xprofile" ]; then
+  grep -qxF 'xset -b' ~/.xprofile || echo 'xset -b' >> ~/.xprofile
+else 
+  touch ~/.xprofile
+  echo 'xset -b' >> ~/.xprofile
+fi
+
 $say "Cleaning up directories"
 rmdir ~/Music ~/Pictures ~/Public ~/Templates ~/Videos
