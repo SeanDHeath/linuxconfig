@@ -11,3 +11,7 @@ python-pip
 clang
 golang
 cmake
+clang-format
+dos2unix
+build-essential
+python3-pip
