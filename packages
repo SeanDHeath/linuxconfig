@@ -15,3 +15,9 @@ clang-format
 dos2unix
 build-essential
 python3-pip
+lutris
+nvidia-driver-430
+nvidia-gl-430
+nvidia-gl-430:i386
+libvulkan1
+libvulkan1:i386

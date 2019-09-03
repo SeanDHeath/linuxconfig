@@ -22,7 +22,10 @@ echo "Done"
 
 
 say "Setting up repositories"
-yes "" | sudo add-apt-repository ppa:pbek/qownnotes
+sudo add-apt-repository --yes ppa:pbek/qownnotes
+sudo add-apt-repository --yes ppa:lutris-team/lutris
+sudo add-apt-repository --yes ppa:graphics-drivers/ppa
+sudo dpkg --add-architecture i386
 echo "Done"
 
 say "Installing packages"
@@ -112,6 +115,13 @@ echo "Done"
 say "Disabling system beep"
 touch $HOME/.xprofile
 grep -qxF 'xset -b' $HOME/.xprofile || echo 'xset -b' >> $HOME/.xprofile
+echo "Done"
+
+say "Setting up startup script"
+sudo cp files/startup.conf /etc/systemd/system/system.conf
+sudo cp files/startup.sh /opt/startup.sh
+sudo chown root:root /opt/startup.sh
+sudo chmod 700 /opt/startup.sh
 echo "Done"
 
 say "Cleaning up directories"
