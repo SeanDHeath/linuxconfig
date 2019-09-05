@@ -117,6 +117,12 @@ touch $HOME/.xprofile
 grep -qxF 'xset -b' $HOME/.xprofile || echo 'xset -b' >> $HOME/.xprofile
 echo "Done"
 
+#say "Fixing CPU throttling"
+#sudo git clone https://github.com/erpalma/lenovo-throttling-fix.git /opt/throttled
+#sudo /opt/throttled/install.sh
+#sudo systemctl enable lenovo_fix.service
+#sudo systemctl start lenovo_fix.service
+
 say "Setting up startup script"
 sudo cp files/startup.conf /etc/systemd/system/system.conf
 sudo cp files/startup.sh /opt/startup.sh
