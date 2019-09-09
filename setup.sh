@@ -23,9 +23,6 @@ echo "Done"
 
 say "Setting up repositories"
 sudo add-apt-repository --yes ppa:pbek/qownnotes
-sudo add-apt-repository --yes ppa:lutris-team/lutris
-sudo add-apt-repository --yes ppa:graphics-drivers/ppa
-sudo dpkg --add-architecture i386
 echo "Done"
 
 say "Installing packages"
@@ -128,7 +125,7 @@ say "Cleaning up directories"
 targets=(Music Pictures Public Templates Videos)
 for target in $targets; do 
   if [ -d "$HOME/$target" ]; then
-    rm $HOME/$target
+    rm -rf /home/user/$target
   fi
 done
 echo "Done"
