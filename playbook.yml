@@ -1,0 +1,8 @@
+---
+        - name: "Configuration for Desktop"
+          hosts: localhost
+          tasks:
+                  - name: "test"
+                    shell: "ls -alh"
+                    register: "output"
+
