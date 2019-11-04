@@ -1,8 +1,68 @@
 ---
         - name: "Configuration for Desktop"
           hosts: localhost
+          vars:
+                  packages:
+                          - progress
+                          - vim
+                          - keepassxc
+                          - aptitude
+                          - htop
+                          - golang
+                          - tree
+                          - secure-delete
+                          - virt-manager
+                          - nordvpn
+                          - syncthing-gtk
           tasks:
-                  - name: "test"
-                    shell: "ls -alh"
-                    register: "output"
+                  - name: "Gather package facts"
+                    package_facts:
+                            manager: "auto"
+
+                  - name: "Install NordVPN deb"
+                    become: yes
+                    apt:
+                            deb: "https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/nordvpn-release_1.0.0_all.deb"
+                    when: "'nordvpn' not in ansible_facts.packages"
+
+                  - name: "Add syncthing repo"
+                    become: yes
+                    apt-key:
+                            url: "https://syncthing.net/release-key.txt"
+                            state: present
+                    when: "'syncthing' not in ansible_facts.packages"
+
+                  - name: "Update package list"
+                    become: yes
+                    apt:
+                            update_cache: yes
+
+                  - name: "Install packages"
+                    become: yes
+                    apt:
+                            name: "{{ packages }}"
+                            state: latest
+
+                  - name: "Install Keybase"
+                    become: yes
+                    apt:
+                            deb: "https://prerelease.keybase.io/keybase_amd64.deb"
+                    when: "'keybase' not in ansible_facts.packages"
+
+                  - name: "Check if Joplin is installed"
+                    stat:
+                            path: "~/.joplin/Joplin.AppImage"
+                    register: joplin_details
+
+                  - name: "Download Joplin"
+                    get_url:
+                            url: "https://raw.githubusercontent.com/laurent22/joplin/master/Joplin_install_and_update.sh"
+                            dest: /tmp/joplin.sh
+                    when: joplin_details.stat.exists == false
+
+                  - name: "Install Joplin"
+                    shell: "/bin/bash /tmp/joplin.sh"
+                    when: joplin_details.stat.exists == false
+
+
 
