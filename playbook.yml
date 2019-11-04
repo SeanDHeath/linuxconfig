@@ -14,28 +14,38 @@
                           - virt-manager
                           - nordvpn
                           - syncthing-gtk
+                          - build-essential
+                          - cmake
+                          - python3-dev
           tasks:
+
                   - name: "Gather package facts"
+                    become: yes
                     package_facts:
-                            manager: "auto"
+                            manager: "apt"
+
+                            #- name: "List package facts"
+                            #debug:
+                            #msg: "{{ ansible_facts.packages }}"
 
                   - name: "Install NordVPN deb"
                     become: yes
                     apt:
                             deb: "https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/nordvpn-release_1.0.0_all.deb"
                     when: "'nordvpn' not in ansible_facts.packages"
-
+                  
                   - name: "Add syncthing repo"
                     become: yes
-                    apt-key:
+                    apt_key:
                             url: "https://syncthing.net/release-key.txt"
                             state: present
                     when: "'syncthing' not in ansible_facts.packages"
 
-                  - name: "Update package list"
+                  - name: "Install Slack"
                     become: yes
                     apt:
-                            update_cache: yes
+                            deb: "https://downloads.slack-edge.com/linux_releases/slack-desktop-4.1.1-amd64.deb"
+                    when: "'slack' not in ansible_facts.packages"
 
                   - name: "Install packages"
                     become: yes
@@ -64,5 +74,46 @@
                     shell: "/bin/bash /tmp/joplin.sh"
                     when: joplin_details.stat.exists == false
 
+                  - name: "Add user to libvirt group"
+                    become: yes
+                    user:
+                            name: "{{ ansible_user_id }}"
+                            groups: "libvirt"
+                            append: yes
+
+                  - name: "Enable libvirtd"
+                    become: yes
+                    systemd:
+                            name: "libvirtd"
+                            state: started
+                            enabled: yes
+
+                  - name: "Clone VIM config"
+                    git:
+                            repo: "https://seandheath@github.com/seandheath/vim.git"
+                            dest: "~/.vim"
+                    register: vim_output
+                    ignore_errors: yes
+
+                    #- name: "Show vim output"
+                    #debug:
+                    #msg: "{{ vim_output.before }}"
+
+                  - name: "Run VIM setup"
+                    shell: "~/.vim/setup.sh"
+                    when: vim_output['before'] != vim_output['after']
+                    ignore_errors: yes
+
+                  - name: "Clone bash config"
+                    git:
+                            repo: "https://seandheath@github.com/seandheath/bash.git"
+                            dest: "~/.bash"
+                    register: bash_output
+                    ignore_errors: yes
+
+                  - name: "Run bash setup"
+                    shell: "~/.bash/setup.sh"
+                    when: bash_output['before'] != bash_output['after']
+                    ignore_errors: yes
 
 
