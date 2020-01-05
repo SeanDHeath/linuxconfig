@@ -12,22 +12,19 @@
           - tree
           - secure-delete
           - virt-manager
-          - nordvpn
+          - syncthing-gtk
           - build-essential
           - cmake
           - python3-dev
+          - python3-pip
+          - openvpn
+          - ca-certificates
       tasks:
 
         - name: "Gather package facts"
           become: yes
           package_facts:
-            manager: "apt"
-
-        - name: "Install NordVPN deb"
-          become: yes
-          apt:
-            deb: "https://repo.nordvpn.com/deb/nordvpn/debian/pool/main/nordvpn-release_1.0.0_all.deb"
-          when: "'nordvpn' not in ansible_facts.packages"
+            manager: "auto"
 
         - name: "Add syncthing repo"
           become: yes
@@ -36,17 +33,23 @@
             state: present
           when: "'syncthing' not in ansible_facts.packages"
 
+        - name: "Check if slack is installed"
+          stat:
+            path: "/usr/bin/slack"
+          register: slack
+
         - name: "Install Slack"
           become: yes
           apt:
             deb: "https://downloads.slack-edge.com/linux_releases/slack-desktop-4.1.1-amd64.deb"
-          when: "'slack' not in ansible_facts.packages"
+          when: slack.stat.exists == "false"
 
         - name: "Install packages"
           become: yes
           apt:
             name: "{{ packages }}"
             state: latest
+            update_cache: yes
 
         - name: "Install Keybase"
           become: yes
@@ -68,13 +71,6 @@
         - name: "Install Joplin"
           shell: "/bin/bash /tmp/joplin.sh"
           when: joplin_details.stat.exists == false
-
-        - name: "Add user to libvirt group"
-          become: yes
-          user:
-            name: "{{ ansible_user_id }}"
-            groups: "libvirt"
-            append: yes
 
         - name: "Enable libvirtd"
           become: yes
@@ -111,3 +107,15 @@
           git:
             repo: "https://github.com/gTile/gTile.git"
             dest: "~/.local/share/gnome-shell/extensions/gTile@vibou"
+
+        - name: "Install No Hot Corner extension"
+          git:
+            repo: "https://github.com/HROMANO/nohotcorner.git"
+            dest: "~/.local/share/gnome-shell/extensions/nohotcorner@hromano"
+
+        - name: "Install OpenPYN"
+          become: yes
+          pip:
+            name: openpyn
+            executable: pip3
+
