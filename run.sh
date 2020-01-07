@@ -1,8 +1,14 @@
 #!/bin/bash
 
-PKG="progress neovim keepassxc htop go tree qemu virt-manager syncthing cmake openvpn keybase-gui base-devel yay"
+PKG="ebtables progress neovim keepassxc htop go tree qemu virt-manager syncthing cmake openvpn keybase-gui base-devel yay"
+AUR_PKG="slack-desktop rslsync gotop-git"
+PIP_PKG="openpyn"
 
-AUR_PKG="slack-desktop rslsync"
+CONF_DIR="$HOME/.config/linuxconfig"
+if ! cd $CONF_DIR ; then
+	echo "Config directory not located in $HOME/.config/linuxconfig"
+	exit 1
+fi
 
 # Install pacman packages
 sudo pacman --needed --noconfirm -S $PKG
@@ -11,38 +17,37 @@ sudo pacman --needed --noconfirm -S $PKG
 yay --needed --noconfirm -S $AUR_PKG
 
 # Install pip packages
-sudo pip install openpyn
+sudo pip install $PIP_PKG
 
 # Install Joplin
 wget -O - https://raw.githubusercontent.com/laurent22/joplin/master/Joplin_install_and_update.sh | bash
 
 # Install gtile
-git clone https://github.com/gTile/gTile.git $HOME/.local/share/gnome-shell/extensions/gTile@vibou
+if [ ! -d "$HOME/.local/share/gnome-shell/extensions/gTile@vibou" ]; then
+	git clone https://github.com/gTile/gTile.git $HOME/.local/share/gnome-shell/extensions/gTile@vibou
+fi
 
 # Install vim config
-mkdir -p $HOME/.config/nvim
-cp $HOME/.config/linuxconfig/files/init.vim $HOME/.config/nvim/
-git clone https://seandheath@github.com/seandheath/vim.git $HOME/.vim
-cd $HOME/.vim
-$HOME/.vim/setup.sh
+if [ ! -d "$HOME/.vim" ]; then
+	mkdir -p $HOME/.config/nvim
+	cp $HOME/.config/linuxconfig/files/init.vim $HOME/.config/nvim/
+	git clone https://seandheath@github.com/seandheath/vim.git $HOME/.vim
+	cd $HOME/.vim
+	$HOME/.vim/setup.sh
+	cd $CONF_DIR
+fi
 
 # Install bash config
-git clone https://seandheath@github.com/seandheath/bash.git $HOME/.bash
-cd $HOME/.bash
-$HOME/.bash/setup.sh
+if [ ! -d "$HOME/.bash" ]; then
+	git clone https://seandheath@github.com/seandheath/bash.git $HOME/.bash
+	cd $HOME/.bash
+	$HOME/.bash/setup.sh
+	cd $CONF_DIR
+fi
 
-# Set up libvirt image folder
-sudo rm -rf /var/lib/libvirt/images
-sudo ln -s $HOME/files/vm/images /var/lib/libvirt/images 
-
-# Set up syncthing
-rm -rf $HOME/.config/syncthing
-ln -s $HOME/files/config/syncthing $HOME/.config/syncthing
-
-# Set up ssh
-rm -rf $HOME/.ssh
-ln -s $HOME/files/ssh $HOME/.ssh
-
-# Set up rslsync
-sudo systemctl enable rslsync
-sudo systemctl start rslsync
+# Set up files folder (if present)
+if [ -d "$HOME/files" ]; then
+	cd $HOME/files/config
+	$HOME/files/config/setup.sh
+	cd $CONF_DIR
+fi
