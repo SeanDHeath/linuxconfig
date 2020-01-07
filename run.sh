@@ -45,6 +45,13 @@ if [ ! -d "$HOME/.bash" ]; then
 	cd $CONF_DIR
 fi
 
+# Set up dconf bindings
+cd $CONF_DIR
+dconf load /org/gnome/desktop/interface/ < files/org-gnome-desktop-interface.dconf
+dconf load /org/gnome/desktop/wm/keybindings/ < files/org-gnome-desktop-wm-keybindings.dconf
+dconf load /org/gnome/settings-daemon/plugins/media-keys/ < files/org-gnome-settings-daemon-plugins-media-keys.dconf
+dconf load /org/gnome/shell/extensions/gtile/ < files/org-gnome-shell-extensions-gtile.dconf
+
 # Set up files folder (if present)
 if [ -d "$HOME/files" ]; then
 	cd $HOME/files/config

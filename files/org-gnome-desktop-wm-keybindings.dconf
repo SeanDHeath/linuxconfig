@@ -1,0 +1,6 @@
+[/]
+panel-main-menu=['<Alt>F1']
+switch-applications=@as []
+switch-applications-backward=@as []
+switch-windows=['<Alt>Tab']
+switch-windows-backward=['<Shift><Alt>Tab']
