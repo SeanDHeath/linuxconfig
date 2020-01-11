@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PKG="dconf-cli seclists gobuster tor"
+PKG="dconf-cli python3-pip seclists gobuster tor"
 
 CONF_DIR="$HOME/.config/linuxconfig"
 if ! cd $CONF_DIR ; then
@@ -13,12 +13,7 @@ sudo apt update
 sudo apt install -y $PKG
 
 # Install pip packages
-sudo pip install $PIP_PKG
-
-# Install gtile
-if [ ! -d "$HOME/.local/share/gnome-shell/extensions/gTile@vibou" ]; then
-	git clone https://github.com/gTile/gTile.git $HOME/.local/share/gnome-shell/extensions/gTile@vibou
-fi
+sudo pip3 install $PIP_PKG
 
 # Set up dconf bindings
 cd $CONF_DIR
