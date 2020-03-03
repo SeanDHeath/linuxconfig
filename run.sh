@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PKG="ebtables progress neovim keepassxc htop go tree qemu virt-manager syncthing cmake openvpn keybase-gui base-devel yay"
-AUR_PKG="slack-desktop rslsync gotop-git"
+PKG="chromium ccid opensc ebtables progress neovim keepassxc htop go tree qemu virt-manager syncthing cmake openvpn base-devel yay"
+AUR_PKG="slack-desktop rslsync gotop-git joplin keybase-bin"
 PIP_PKG="openpyn"
 
 CONF_DIR="$HOME/.config/linuxconfig"
@@ -19,9 +19,6 @@ yay --needed --noconfirm -S $AUR_PKG
 # Install pip packages
 sudo pip install $PIP_PKG
 
-# Install Joplin
-wget -O - https://raw.githubusercontent.com/laurent22/joplin/master/Joplin_install_and_update.sh | bash
-
 # Install gtile
 if [ ! -d "$HOME/.local/share/gnome-shell/extensions/gTile@vibou" ]; then
 	git clone https://github.com/gTile/gTile.git $HOME/.local/share/gnome-shell/extensions/gTile@vibou
@@ -34,6 +31,7 @@ if [ ! -d "$HOME/.vim" ]; then
 	git clone https://seandheath@github.com/seandheath/vim.git $HOME/.vim
 	cd $HOME/.vim
 	$HOME/.vim/setup.sh
+        sudo ln -s /usr/bin/nvim /usr/bin/vim
 	cd $CONF_DIR
 fi
 
@@ -44,6 +42,10 @@ if [ ! -d "$HOME/.bash" ]; then
 	$HOME/.bash/setup.sh
 	cd $CONF_DIR
 fi
+
+# Set up resiliosync
+sudo systemctl --now enable rslsync
+sudo usermod -aG rslsync user
 
 # Set up dconf bindings
 cd $CONF_DIR
