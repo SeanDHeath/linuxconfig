@@ -1,0 +1,1 @@
+Wandmalfarbe/pandoc-latex-template

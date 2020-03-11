@@ -1,0 +1,7 @@
+slack-desktop
+rslsync
+gotop-git
+joplin
+keybase-bin
+vscodium-bin
+drawio-desktop

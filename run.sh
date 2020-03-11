@@ -1,8 +1,9 @@
 #!/bin/bash
 
-PKG="chromium ccid opensc ebtables progress neovim keepassxc htop go tree qemu virt-manager syncthing cmake openvpn base-devel yay"
-AUR_PKG="slack-desktop rslsync gotop-git joplin keybase-bin"
-PIP_PKG="openpyn"
+PKG=$(cat pacman.txt)
+AUR_PKG=$(cat aur.txt)
+PIP_PKG=$(cat pip.txt)
+GIT_TOOLS=$(cat github.txt)
 
 CONF_DIR="$HOME/.config/linuxconfig"
 if ! cd $CONF_DIR ; then
